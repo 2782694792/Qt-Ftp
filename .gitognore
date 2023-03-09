@@ -1,0 +1,13 @@
+debug
+release
+x64
+img
+images
+*.user
+*.c7cf23f
+*.sdf
+*.sln
+*.vcxproj
+*.filters
+*.suo
+
