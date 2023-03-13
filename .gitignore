@@ -1,0 +1,12 @@
+debug
+Debug
+x64
+release
+Release
+img
+images
+*.txt
+*.vcxproj
+*.user
+*.aps
+*.filters

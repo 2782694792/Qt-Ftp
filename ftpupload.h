@@ -215,13 +215,9 @@ public:
 
 	void getFileName(QString DirPath);
 
-	bool IsLogin;
+    bool IsLogin;
 
-	
 	QMutex mutex;
-
-
-
 
     /**********************************************
      * @projectName   FtpUpload2
@@ -229,10 +225,12 @@ public:
      * @author        bin
      * @date          2023-03-01
      */
+    void initComponent(bool enable);
     void UploadCustomDir(QString path, QString pathname);
     void UpFileList(QString path);
     void sleep(unsigned int msec); // ÑÓÊ±¹¦ÄÜ
     void backUp();
+    void uploadStatusEvent(bool ing, const char * prefixnotice, QString content);
     /**********************************************/
 
 
