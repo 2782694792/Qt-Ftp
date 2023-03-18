@@ -6,5 +6,6 @@
         <file>img/file.png</file>
         <file>img/Help_btn.png</file>
         <file>img/min_btn.png</file>
+        <file>img/FTP.png</file>
     </qresource>
 </RCC>

@@ -6,6 +6,8 @@
 
 QT       += core gui network
 
+RC_FILE += ico.rc
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = FtpUpload2
