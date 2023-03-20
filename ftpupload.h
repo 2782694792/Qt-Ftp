@@ -239,7 +239,7 @@ public:
     void UpFileList(const QString& path);
     void sleep(unsigned int msec); // 延时功能
     bool backUp();                 // 上一级，返回： 根目录为 true
-    void uploadStatusEvent(bool           ing,
+    void uploadStatusEvent(bool success, bool           ing,
                            const char*    prefixnotice,
                            const QString& content);
     bool qstrIsEffective(const QString& str);
@@ -247,7 +247,7 @@ public:
     void ScheduledUP(bool evening, int hour, int minute);
     void timeChanged(const QString& content, int id);
 
-
+    void setMyAppAutoRun(bool isStart); // 开机自启
   protected:
     void mousePressEvent(QMouseEvent* event);
     void mouseMoveEvent(QMouseEvent* event);
@@ -256,6 +256,7 @@ public:
   private:
     QPoint mousePoint;
     bool   mouse_press;
+    int m_upload_num = 0;
 
     /**********************************************/
 };

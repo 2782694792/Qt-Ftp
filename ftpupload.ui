@@ -40,14 +40,14 @@
        <widget class="QLabel" name="label">
         <property name="minimumSize">
          <size>
-          <width>101</width>
-          <height>21</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
         <property name="maximumSize">
          <size>
-          <width>111</width>
-          <height>21</height>
+          <width>90</width>
+          <height>16777215</height>
          </size>
         </property>
         <property name="font">
@@ -83,15 +83,18 @@
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
         </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Expanding</enum>
+        </property>
         <property name="sizeHint" stdset="0">
          <size>
-          <width>278</width>
-          <height>20</height>
+          <width>0</width>
+          <height>0</height>
          </size>
         </property>
        </spacer>
       </item>
-      <item row="0" column="2">
+      <item row="0" column="4">
        <layout class="QVBoxLayout" name="verticalLayout_6">
         <item>
          <layout class="QHBoxLayout" name="horizontalLayout_8">
@@ -197,6 +200,37 @@ QPushButton:disabled{ border-image:url(:/img/img/close_btn.png) 99 0 0 0 ;}</str
          </layout>
         </item>
        </layout>
+      </item>
+      <item row="0" column="2">
+       <widget class="QLabel" name="label_auto">
+        <property name="font">
+         <font>
+          <family>微软雅黑</family>
+          <pointsize>14</pointsize>
+          <weight>75</weight>
+          <bold>true</bold>
+         </font>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">color: yellow;</string>
+        </property>
+        <property name="text">
+         <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="3">
+       <spacer name="horizontalSpacer_9">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
       </item>
      </layout>
     </widget>
@@ -1587,17 +1621,10 @@ QProgressBar::chunk {
        <property name="styleSheet">
         <string notr="true">color: rgb(0, 142, 213);</string>
        </property>
-       <property name="minimumTime">
-        <time>
-         <hour>0</hour>
-         <minute>5</minute>
-         <second>0</second>
-        </time>
-       </property>
        <property name="time">
         <time>
          <hour>0</hour>
-         <minute>5</minute>
+         <minute>0</minute>
          <second>0</second>
         </time>
        </property>

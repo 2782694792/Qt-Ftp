@@ -47,6 +47,8 @@ public:
     QPushButton *setButton;
     QPushButton *minButton;
     QPushButton *closeButton;
+    QLabel *label_auto;
+    QSpacerItem *horizontalSpacer_9;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_13;
     QLabel *label_3;
@@ -156,8 +158,8 @@ public:
         gridLayout->setObjectName(QStringLiteral("gridLayout"));
         label = new QLabel(widget);
         label->setObjectName(QStringLiteral("label"));
-        label->setMinimumSize(QSize(101, 21));
-        label->setMaximumSize(QSize(111, 21));
+        label->setMinimumSize(QSize(0, 0));
+        label->setMaximumSize(QSize(90, 16777215));
         QFont font;
         font.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
         font.setPointSize(14);
@@ -172,7 +174,7 @@ public:
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
 
-        horizontalSpacer_3 = new QSpacerItem(278, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+        horizontalSpacer_3 = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_3, 0, 1, 1, 1);
 
@@ -229,7 +231,18 @@ public:
         verticalLayout_6->addLayout(horizontalLayout_8);
 
 
-        gridLayout->addLayout(verticalLayout_6, 0, 2, 1, 1);
+        gridLayout->addLayout(verticalLayout_6, 0, 4, 1, 1);
+
+        label_auto = new QLabel(widget);
+        label_auto->setObjectName(QStringLiteral("label_auto"));
+        label_auto->setFont(font);
+        label_auto->setStyleSheet(QStringLiteral("color: yellow;"));
+
+        gridLayout->addWidget(label_auto, 0, 2, 1, 1);
+
+        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_9, 0, 3, 1, 1);
 
 
         gridLayout_3->addWidget(widget, 0, 0, 1, 1);
@@ -875,8 +888,7 @@ public:
         timeEdit_evening->setMinimumSize(QSize(50, 0));
         timeEdit_evening->setFont(font5);
         timeEdit_evening->setStyleSheet(QStringLiteral("color: rgb(0, 142, 213);"));
-        timeEdit_evening->setMinimumTime(QTime(0, 5, 0));
-        timeEdit_evening->setTime(QTime(0, 5, 0));
+        timeEdit_evening->setTime(QTime(0, 0, 0));
 
         horizontalLayout_2->addWidget(timeEdit_evening);
 
@@ -933,6 +945,7 @@ public:
         setButton->setText(QString());
         minButton->setText(QString());
         closeButton->setText(QString());
+        label_auto->setText(QString());
         label_3->setText(QApplication::translate("FtpUpload", "  \345\267\245\345\216\202  ", Q_NULLPTR));
 #ifndef QT_NO_TOOLTIP
         lineEdit_factory->setToolTip(QApplication::translate("FtpUpload", "\345\220\215\347\247\260\344\270\215\350\203\275\345\214\205\345\220\253\344\273\273\344\275\225\345\255\227\347\254\246:\n"

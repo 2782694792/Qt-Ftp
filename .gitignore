@@ -10,3 +10,6 @@ images
 *.user
 *.aps
 *.filters
+*.Debug
+*.Release
+*.sdf
