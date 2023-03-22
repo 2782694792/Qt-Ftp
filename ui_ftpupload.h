@@ -638,7 +638,7 @@ public:
         font7.setBold(true);
         font7.setWeight(75);
         textEdit_fail->setFont(font7);
-        textEdit_fail->setStyleSheet(QStringLiteral("QTextEdit{border:1px solid #828282;color: yellow;background:transparent;}"));
+        textEdit_fail->setStyleSheet(QStringLiteral("QTextEdit{border:1px solid #828282;color: red;background:transparent;}"));
 
         horizontalLayout_12->addWidget(textEdit_fail);
 

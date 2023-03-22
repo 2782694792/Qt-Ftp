@@ -1024,7 +1024,7 @@ QPushButton:disabled{ border-image:url(:/img/img/close_btn.png) 99 0 0 0 ;}</str
           </font>
          </property>
          <property name="styleSheet">
-          <string notr="true">QTextEdit{border:1px solid #828282;color: yellow;background:transparent;}</string>
+          <string notr="true">QTextEdit{border:1px solid #828282;color: red;background:transparent;}</string>
          </property>
         </widget>
        </item>

@@ -44,6 +44,7 @@ struct DefaultPath // 默认路径
     int Minute;
     int Hour_Evening;
     int Minute_Evening;
+    bool autoUpload;
 
     // 模式
     bool initiative; // 主动模式
