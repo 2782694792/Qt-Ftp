@@ -129,7 +129,6 @@ void FtpUpload::InitWidget()
         connect(m_ftp, SIGNAL(stateChanged(int)), this,
                 SLOT(ftpStateChanged(int)));
 
-        ui.timeEdit->setEnabled(true);
         ui.lineEdit_Host->setText(Default.m_HostStr);
         ui.lineEdit_Port->setText(QString("%1").arg(Default.m_port));
         ui.lineEdit_User->setText(Default.UserStr);
@@ -148,7 +147,7 @@ void FtpUpload::InitWidget()
         ui.lineEdit_procedure->setText(Default.procedure);
         ui.lineEdit_station->setText(Default.station);
 
-        currentPath = Default.m_TargetPath;
+        currentPath = "";
 
         connect(m_timer, SIGNAL(timeout()), this, SLOT(GetTime())); // 定时器
 
@@ -161,15 +160,14 @@ void FtpUpload::InitWidget()
     {
         initComponent(false);
 
-//        ui.pushButton_ComfirmT->setEnabled(true);
-//        ui.pushButton_CancelT->setEnabled(false);
         ui.cancelBtn->setEnabled(false);
+        ui.pushButton_CancelT->setEnabled(false);
+
         ui.pushButton_Quit->setVisible(false);
         ui.setButton->setVisible(false);
 
         ui.radioButtonActive->setChecked(Default.initiative);
         ui.radioButtonPassive->setChecked(Default.passive);
-        ui.CB_EncodingFormat->setCurrentIndex(Default.encoding);
         ui.CB_EncodingFormat->addItem("GBK");
         ui.CB_EncodingFormat->addItem("UTF-8");
         ui.CB_EncodingFormat->setCurrentIndex(0);
@@ -179,16 +177,21 @@ void FtpUpload::InitWidget()
         ui.label_currentpath->setAlignment(Qt::AlignLeft);
         ui.label_currentpath->setAlignment(Qt::AlignVCenter);
 
-        if(Default.autoUpload)
-        {
-            try {
-                on_pushButton_Login_clicked();
+//        if(Default.autoUpload)
+//        {
+//            initComponent(false);
+//            try {
+//                m_timer->stop();
+//                m_ftp->close();
 
-                on_pushButton_ComfirmT_clicked();
-            } catch (...) {
-                CancelT();
-            }
-        }
+//                ui.pushButton_Login->setEnabled(true);
+//                on_pushButton_Login_clicked();
+
+//                on_pushButton_ComfirmT_clicked();
+//            } catch (...) {
+//                CancelT();
+//            }
+//        }
     }
 }
 
@@ -215,6 +218,7 @@ void FtpUpload::on_pushButton_Login_clicked()
         ui.pushButton_Login->setText(QString::fromLocal8Bit("登录"));
         ui.treeWidget->clear();
         isDirectory.clear();
+        WriteDefaultPath();
         initComponent(false);
     }
     else {
@@ -232,11 +236,12 @@ void FtpUpload::on_pushButton_Login_clicked()
         if (!ip.isEmpty() && !port.isEmpty() && !userName.isEmpty() &&
             !psw.isEmpty()) {
             m_ftp->connectToHost(ip, port.toInt());
-            m_ftp->login(userName, psw); // 登陆服务器;
+            m_ftp->login(userName, psw); // 登陆服务器
         }
         else {
             ui.statusLabel->setText(QString::fromLocal8Bit("参数不能为空"));
         }
+        initComponent(true);
     }
 }
 
@@ -245,10 +250,6 @@ void FtpUpload::on_checkBox_AutoLogin_clicked(bool checked)
 {
     if (checked == true) {
         on_pushButton_Login_clicked();
-//        ui.pushButton_ComfirmT->setEnabled(true);
-//        ui.pushButton_CancelT->setEnabled(false);
-        ui.timeEdit->setEnabled(false);
-        ConfirmT();
     }
 }
 
@@ -280,21 +281,12 @@ void FtpUpload::S_commandFinish(int tmp, bool en)
             ui.textEdit->append(QString::fromLocal8Bit("登录服务器成功"));
             ui.pushButton_Login->setText(QString::fromLocal8Bit("注销"));
 
-            if (strDirPath != "") {
-                ui.lineEdit_DirPath->setText(strDirPath);
-            }
+//            currentPath = Default.m_TargetPath;
+            currentPath = "/";
+            m_ftp->cd(toSpecialEncoding("/"));
 
-            if (strDirPath2 != "") {
-                ui.lineEdit_DirPath_2->setText(strDirPath2);
-            }
-
-            currentPath = Default.m_TargetPath;
-            if (currentPath != "")
-                m_ftp->cd(toSpecialEncoding(currentPath));
             ui.treeWidget->clear();
             m_ftp->list();
-
-            initComponent(true);
         }
     }
 
@@ -322,6 +314,7 @@ void FtpUpload::S_commandFinish(int tmp, bool en)
                                 .arg(m_ftp->errorString()));
             ui.textEdit->append(QString::fromLocal8Bit("上传出现错误：%1")
                                     .arg(m_ftp->errorString()));
+            m_ftp->abort();
         }
         else {
             if (m_loop.isRunning())
@@ -335,6 +328,7 @@ void FtpUpload::S_commandFinish(int tmp, bool en)
     else if (m_ftp->currentCommand() == QFtp::Unconnected) {
         //        myMessageOutput(QString::fromLocal8Bit("断开连接"));
         ui.textEdit->append(QString::fromLocal8Bit("连接断开"));
+
     }
     else if (m_ftp->currentCommand() == QFtp::Rename) {
         //        myMessageOutput(QString::fromLocal8Bit("文件重命名成功"));
@@ -370,11 +364,12 @@ void FtpUpload::ftpCommandStarted(int tem)
     }
     if (m_ftp->currentCommand() == QFtp::Get) {
         //        myMessageOutput(QString::fromLocal8Bit("正在下载..."));
-        ui.textEdit->append(QString::fromLocal8Bit("正在下载..."));
+//        ui.textEdit->append(QString::fromLocal8Bit("正在下载..."));
     }
     if (m_ftp->currentCommand() == QFtp::Put) {
         //        myMessageOutput(QString::fromLocal8Bit("正在上传..."));
-        ui.textEdit->append(QString::fromLocal8Bit("正在上传..."));
+//        ui.textEdit->append(QString::fromLocal8Bit("正在上传..."));
+
     }
     else if (m_ftp->currentCommand() == QFtp::Close) {
         //        myMessageOutput(QString::fromLocal8Bit("正在关闭连接..."));
@@ -387,29 +382,25 @@ void FtpUpload::ftpStateChanged(int state)
 {
     if (state == QFtp::Unconnected) {
         IsLogin = false;
-        //        myMessageOutput(QString::fromLocal8Bit("未连接到主机"));
+        myMessageOutput(QString::fromLocal8Bit("未连接到主机"));
         ui.textEdit->append(QString::fromLocal8Bit("未连接到主机"));
         ui.pushButton_Login->setText(QString::fromLocal8Bit("登录"));
         ui.treeWidget->clear();
-        // 登录
-        // on_pushButton_Login_clicked();
+        initComponent(false);
     }
     if (state == QFtp::Connected) {
-        //        myMessageOutput(QString::fromLocal8Bit("已经连接到主机"));
         ui.textEdit->append(QString::fromLocal8Bit("已经连接到主机"));
     }
     if (state == QFtp::HostLookup) {
-        //        myMessageOutput(QString::fromLocal8Bit("正在查找主机"));
         ui.textEdit->append(QString::fromLocal8Bit("正在查找主机"));
     }
     if (state == QFtp::LoggedIn) {
-        //        myMessageOutput(QString::fromLocal8Bit("已经登录"));
         ui.textEdit->append(QString::fromLocal8Bit("已经登录"));
         IsLogin = true;
     }
     if (state == QFtp::Closing) {
-        //        myMessageOutput(QString::fromLocal8Bit("连接正在关闭"));
         ui.textEdit->append(QString::fromLocal8Bit("连接正在关闭"));
+        initComponent(false);
     }
 }
 
@@ -520,7 +511,7 @@ void FtpUpload::on_uploadButton_clicked()
             ui.textEdit->append(QString::fromLocal8Bit("文件被占用"));
             QMessageBox::warning(NULL, QString::fromLocal8Bit("文件打开异常"),
                                  QString::fromLocal8Bit("文件被占用"));
-            uploadStatusEvent(false, true, "异常，文件被占用 : ", fileName);
+            uploadStatusEvent(false, false, "异常，文件被占用 : ", fileName);
             m_File->close();
             return;
         }
@@ -530,7 +521,7 @@ void FtpUpload::on_uploadButton_clicked()
     else {
         QMessageBox::warning(NULL, QString::fromLocal8Bit("文件异常"),
                              fileName + QString::fromLocal8Bit("文件不存在"));
-        uploadStatusEvent(false, true, "异常，文件不存在 : ", fileName);
+        uploadStatusEvent(false, false, "异常，文件不存在 : ", fileName);
     }
 }
 
@@ -685,6 +676,17 @@ void FtpUpload::GetTime()
     bool upload  = false; // 默认不可上传
 
     if ((hour_m == (current_hour + 1) && current_minute == 58 + minute_m) ||
+        ((current_hour == hour_m) && (minute_m - current_minute) == 5)) {
+        initComponent(false);
+    }
+
+    if ((hour_e == (current_hour + 1) && current_minute == 58 + minute_e) ||
+        ((current_hour == hour_e) && (minute_e - current_minute) == 5)) {
+        initComponent(false);
+    }
+
+
+    if ((hour_m == (current_hour + 1) && current_minute == 58 + minute_m) ||
         ((current_hour == hour_m) && (minute_m - current_minute) == 2)) {
         upload = true;
     }
@@ -703,6 +705,8 @@ void FtpUpload::GetTime()
 
     if (upload) {
         if (IsLogin == false) {
+
+            m_timer->stop();
             on_pushButton_Login_clicked();
         }
 
@@ -712,6 +716,8 @@ void FtpUpload::GetTime()
         ui.label_auto->setText(QString::fromLocal8Bit("(完成: ") +
                                QString::number(m_upload_num) +
                                QString::fromLocal8Bit(")自动定时上传中..."));
+        m_timer->start(37000);
+        initComponent(false);
     }
 }
 
@@ -886,19 +892,14 @@ void FtpUpload::ConfirmT()
     ui.label_auto->setText(QString::fromLocal8Bit("(完成: ") +
                            QString::number(m_upload_num) +
                            QString::fromLocal8Bit(")自动定时上传中..."));
-    ui.pushButton_ComfirmT->setEnabled(false);
-    ui.pushButton_CancelT->setEnabled(true);
-    ui.timeEdit->setEnabled(false);
-    ui.timeEdit_evening->setEnabled(false);
+    initComponent(false);
 }
 
 void FtpUpload::CancelT()
 {
     m_timer->stop();
-    ui.pushButton_ComfirmT->setEnabled(true);
-    ui.pushButton_CancelT->setEnabled(false);
-    ui.timeEdit->setEnabled(true);
-    ui.timeEdit_evening->setEnabled(true);
+
+    initComponent(true);
 
     ui.label_auto->setText(QString::fromLocal8Bit(""));
 }
@@ -1067,48 +1068,45 @@ void FtpUpload::Batch_upload(QString DirPath)
 {
     mutex.lock();
 
-    if (DirPath == "") {
-        mutex.unlock();
-        return;
-    }
-
-    QDir dir(DirPath);
-    if (dir.exists()) {
-        ui.progressBar->setVisible(true);
-        auto fileLst = dir.entryInfoList(QDir::Files);
-        auto end_it  = fileLst.end();
-        for (auto it = fileLst.begin(); it != end_it; it++) {
-            QFile* file = new QFile(it->filePath(), this);
-            if (!file->open(QIODevice::ReadOnly)) {
-                if (m_loop.isRunning())
-                    m_loop.exit();
-                continue;
-            }
-            ui.textEdit->append(QString::fromLocal8Bit("当前正在上传:") +
-                                it->fileName());
-
-            uploadStatusEvent(true, true, "批量文件 : ", it->fileName());
-
-            try {
-                m_ftp->put(file, toSpecialEncoding(it->fileName()));
-            }
-            catch (...) {
-                uploadStatusEvent(false, true,
-                                  "异常，批量文件 : ", it->fileName());
-            }
-
-            m_loop.exec();
-
-            uploadStatusEvent(true, false, "批量文件 : ", it->fileName());
+    try {
+        if (DirPath == "") {
+            mutex.unlock();
+            return;
         }
 
-        ui.progressBar->setValue(0);
-        ui.progressBar->setVisible(false);
+        QDir dir(DirPath);
+        if (dir.exists()) {
+            ui.progressBar->setVisible(true);
+            auto fileLst = dir.entryInfoList(QDir::Files);
+            auto end_it  = fileLst.end();
+            for (auto it = fileLst.begin(); it != end_it; it++) {
+                QFile* file = new QFile(it->filePath(), this);
+                if (!file->open(QIODevice::ReadOnly)) {
+                    if (m_loop.isRunning())
+                        m_loop.exit();
+                    continue;
+                }
+                ui.textEdit->append(QString::fromLocal8Bit("当前正在上传:") +
+                                    it->fileName());
 
-        ui.textEdit->append(QString::fromLocal8Bit("已完成所有文件上传"));
+                uploadStatusEvent(true, true, "批量文件 : ", it->fileName());
+
+                m_ftp->put(file, toSpecialEncoding(it->fileName()));
+
+                m_loop.exec();
+            }
+
+            ui.progressBar->setValue(0);
+            ui.progressBar->setVisible(false);
+            ui.textEdit->append(QString::fromLocal8Bit("已完成所有文件上传"));
+        }
+        refreshed();
+    }
+    catch (...) {
+        uploadStatusEvent(false, false, "异常，批量文件 : ", m_ftp->errorString());
     }
 
-    refreshed();
+    uploadStatusEvent(true, false, "批量文件 : ", DirPath);
 
     mutex.unlock();
 }
@@ -1235,38 +1233,45 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
 
     QDir dir(path);
     if (dir.exists()) {
-
         uploadStatusEvent(true, true, "定时上传文件夹 : ", name);
 
+        sleep(1000);
+
         QString a1 = ui.lineEdit_factory->text();
-        mkdir_cd_update(ui.lineEdit_factory->text()); // 工厂
-
         QString a2 = ui.lineEdit_procedure->text();
-        mkdir_cd_update(ui.lineEdit_procedure->text()); // 工序
-
         QString a3 = ui.lineEdit_manufacturer->text();
-        mkdir_cd_update(ui.lineEdit_manufacturer->text()); // 设备厂家
-
         QString a4 = ui.lineEdit_number->text();
-        mkdir_cd_update(ui.lineEdit_number->text()); // 设备编号
-
-        mkdir_cd_update(QString::fromLocal8Bit("Image")); // Image
-
         QString a5 = QString::number(year);
-        mkdir_cd_update(QString::number(year) + QString::fromLocal8Bit("年")); // 年
-
         QString a6 = QString::number(month);
-        mkdir_cd_update(QString::number(month) +
-                        QString::fromLocal8Bit("月")); // 月
-
         QString a7 = QString::number(day);
-        mkdir_cd_update(QString::number(day) + QString::fromLocal8Bit("日")); // 日
-
         QString a8 = QString::fromLocal8Bit(upload_dirname.data());
-        mkdir_cd_update(QString::fromLocal8Bit(upload_dirname.data())); // 白班 夜班
-
         QString a9 = ui.lineEdit_station->text();
-        mkdir_cd_update(ui.lineEdit_station->text()); // 工位
+        try {
+            mkdir_cd_update(a1); // 工厂
+
+            mkdir_cd_update(ui.lineEdit_procedure->text()); // 工序
+
+            mkdir_cd_update(ui.lineEdit_manufacturer->text()); // 设备厂家
+
+            mkdir_cd_update(ui.lineEdit_number->text()); // 设备编号
+
+            mkdir_cd_update(QString::fromLocal8Bit("Image")); // Image
+
+            mkdir_cd_update(QString::number(year) + QString::fromLocal8Bit("年")); // 年
+
+            mkdir_cd_update(QString::number(month) +
+                            QString::fromLocal8Bit("月")); // 月
+
+            mkdir_cd_update(QString::number(day) + QString::fromLocal8Bit("日")); // 日
+
+            mkdir_cd_update(QString::fromLocal8Bit(upload_dirname.data())); // 白班 夜班
+
+            mkdir_cd_update(ui.lineEdit_station->text()); // 工位
+
+        } catch (...) {
+            uploadStatusEvent(false, false,
+                              "异常，文件夹创建失败 : ", m_ftp->errorString());
+        }
 
         QFile file(GetSciUploadLog());
         if (!file.open(QIODevice::Append | QIODevice::Text)) {
@@ -1287,10 +1292,16 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
         bool    success = false;
         QString content = NULL;
 
-        try {
-            UpFileList(path); // 仅仅文件夹内部
-
+        try {            
             success = true;
+
+            if(!UpFileList(path)) // 仅仅文件夹内部
+            {
+                uploadStatusEvent(false, false,
+                                  "异常，上传失败: ", path);
+                success = false;
+            }
+
             content = QString::fromLocal8Bit("%1/%2/%3/%4/Image/%5/%6/%7/%8/%9")
                     .arg(a1)
                     .arg(a2)
@@ -1314,7 +1325,6 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
                 .arg(date)
                 .arg(content);
         out << outstr;
-
 
 #    ifdef bintest
         // 成功：2023/03/17-8:30;一工厂/包Mylar/1#/2023/3/16/晚班/大面检测工位
@@ -1350,7 +1360,7 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
 
                     refreshed();
 
-                    uploadStatusEvent(true, false, "定时上传文件夹 : ", name);
+                    uploadStatusEvent(success, false, "定时上传文件夹 : ", name);
 
                     m_File->close();
                 }
@@ -1371,7 +1381,6 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
                               "异常，上传结果文件 : ", file.fileName());
             return;
         }
-
     }
     else
     {
@@ -1379,11 +1388,20 @@ void FtpUpload::ScheduledUP(bool evening, int hour, int minute)
                           "异常，文件夹不存在: ", path);
         ui.textEdit_fail->append(QString::fromLocal8Bit("不存在: ") + path + QString::fromLocal8Bit("\r\n"));
     }
+
+    ui.label_auto->setText(QString::fromLocal8Bit("(完成: ") +
+                           QString::number(m_upload_num) +
+                           QString::fromLocal8Bit(")定时上传中..."));
+    ui.pushButton_ComfirmT->setEnabled(false);
+    ui.pushButton_CancelT->setEnabled(true);
+
+    sleep(1000*60*2);
+
     mutex.unlock();
 }
 
 // 上传文件夹
-void FtpUpload::UpFileList(const QString& path)
+bool FtpUpload::UpFileList(const QString& path)
 {
     QDir dir(path);
     if (dir.exists()) {
@@ -1405,7 +1423,8 @@ void FtpUpload::UpFileList(const QString& path)
             }
 
             try {
-                m_ftp->put(file, toSpecialEncoding(it->fileName()));
+                int ret = m_ftp->put(file, toSpecialEncoding(it->fileName()));
+                qDebug() << "put: " << ret << "\n";
                 sleep(200);
             }
             catch (...) {
@@ -1415,9 +1434,9 @@ void FtpUpload::UpFileList(const QString& path)
                 ui.textEdit_fail->append(
                     QString::fromLocal8Bit("上传失败: ") + it->fileName() + QString::fromLocal8Bit("\r\n"));
 
-                uploadStatusEvent(false, true, "异常，上传文件 : ", it->fileName());
+                uploadStatusEvent(false, false, "异常，上传文件 : ", it->fileName());
 
-                continue;
+                return false;
             }
         }
         if (file != nullptr) {
@@ -1455,13 +1474,16 @@ void FtpUpload::UpFileList(const QString& path)
                         ui.textEdit_fail->append(
                             QString::fromLocal8Bit("无法索引: ") +
                             toSpecialEncoding(tempname) + QString::fromLocal8Bit("\r\n"));
-                        uploadStatusEvent(false, true,
+                        uploadStatusEvent(false, false,
                                           "异常，文件夹进入失败 : ", tempname);
 
-                        break;
+                        return false;
                     }
 
-                    UpFileList(temp);
+                    if(!UpFileList(temp))
+                    {
+                        return false;
+                    }
 
                     backUp();
                 }
@@ -1469,11 +1491,13 @@ void FtpUpload::UpFileList(const QString& path)
         }
 
         refreshed();
+        return true;
     }
     else
     {
         uploadStatusEvent(false, false, path.toLatin1().data(), "文件不存在");
-        return;
+
+        return false;
     }
 
 }
@@ -1537,27 +1561,30 @@ void FtpUpload::on_downloadButton_clicked()
 
         try {
             UpFileList(ui.lineEdit_DirPath_2->text());
+            backUp();
+
+            refreshed();
+
+            uploadStatusEvent(true, false, "文件夹 : ", pathname);
         }
         catch (...) {
-            uploadStatusEvent(false, true, "异常，文件夹 : ", pathname);
+            uploadStatusEvent(false, false, "异常，文件夹 : ", pathname);
         }
-
-        backUp();
-
-        refreshed();
-
-        uploadStatusEvent(true, false, "文件夹 : ", pathname);
     }
 }
 
 // 新建并进入文件夹
 void FtpUpload::mkdir_cd_update(const QString& dirname)
 {
-    m_ftp->mkdir(toSpecialEncoding(dirname));
-
-//    qDebug() << dirname << '\n';
-
+    qDebug() << "B " << currentPath << " " << dirname << '\n';
+    if (currentPath.isEmpty()) {
+        m_ftp->cd(toSpecialEncoding(QString::fromLocal8Bit("/")));
+    }
+    currentPath = (currentPath==QString("/"))?QString(""):currentPath;
     currentPath += QString::fromLocal8Bit("/") + dirname;
+    qDebug() << "E " << currentPath << '\n';
+
+    m_ftp->mkdir(toSpecialEncoding(dirname));
     m_ftp->cd(toSpecialEncoding(currentPath));
 
     sleep(100);
@@ -1571,25 +1598,26 @@ void FtpUpload::uploadStatusEvent(bool           success,
 {
     initComponent(!ing);
 
-    ui.cancelBtn->setEnabled(ing);
-
     QString content2;
 
     content2 = QString::fromLocal8Bit(prefixnotice) + content;
     if (success) {
         if (ing) {
             content2 += QString::fromLocal8Bit(" 上传中......");
+            ui.textEdit->append(content2);
             ui.progressBar->setVisible(true);
             myMessageOutput(content2);
         }
         else {
             content2 += QString::fromLocal8Bit(" 上传成功!!!");
+            ui.textEdit->append(content2);
             ui.progressBar->setVisible(false);
             myMessageOutput(content2);
         }
     }
     else {
         content2 += QString::fromLocal8Bit(" 上传失败!!!");
+        ui.textEdit->append(content2);
 //        ui.textEdit_fail->append(content2 + QString::fromLocal8Bit("\r\n"));
         ui.progressBar->setVisible(false);
         myMessageOutput(content2);
@@ -1699,6 +1727,12 @@ void FtpUpload::initComponent(bool enable)
     ui.lineEdit_station->setEnabled(enable);
 
     ui.cancelBtn->setEnabled(!enable);
+
+    ui.timeEdit->setEnabled(enable);
+    ui.timeEdit_evening->setEnabled(enable);
+
+    ui.pushButton_ComfirmT->setEnabled(enable);
+    ui.pushButton_CancelT->setEnabled(!enable);
 }
 
 // 主线程暂停

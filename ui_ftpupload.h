@@ -41,7 +41,6 @@ public:
     QWidget *widget;
     QGridLayout *gridLayout;
     QLabel *label;
-    QSpacerItem *horizontalSpacer_3;
     QVBoxLayout *verticalLayout_6;
     QHBoxLayout *horizontalLayout_8;
     QPushButton *setButton;
@@ -49,6 +48,7 @@ public:
     QPushButton *closeButton;
     QLabel *label_auto;
     QSpacerItem *horizontalSpacer_9;
+    QSpacerItem *horizontalSpacer_3;
     QVBoxLayout *verticalLayout_5;
     QHBoxLayout *horizontalLayout_13;
     QLabel *label_3;
@@ -139,7 +139,7 @@ public:
     {
         if (FtpUpload->objectName().isEmpty())
             FtpUpload->setObjectName(QStringLiteral("FtpUpload"));
-        FtpUpload->resize(578, 704);
+        FtpUpload->resize(664, 704);
         FtpUpload->setMinimumSize(QSize(0, 0));
         QIcon icon;
         icon.addFile(QStringLiteral(":/img/img/FTP.png"), QSize(), QIcon::Normal, QIcon::Off);
@@ -173,10 +173,6 @@ public:
         label->setMargin(0);
 
         gridLayout->addWidget(label, 0, 0, 1, 1);
-
-        horizontalSpacer_3 = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout->addItem(horizontalSpacer_3, 0, 1, 1, 1);
 
         verticalLayout_6 = new QVBoxLayout();
         verticalLayout_6->setSpacing(6);
@@ -243,6 +239,10 @@ public:
         horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         gridLayout->addItem(horizontalSpacer_9, 0, 3, 1, 1);
+
+        horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Minimum, QSizePolicy::Minimum);
+
+        gridLayout->addItem(horizontalSpacer_3, 0, 1, 1, 1);
 
 
         gridLayout_3->addWidget(widget, 0, 0, 1, 1);
@@ -580,7 +580,7 @@ public:
 
         statusLabel = new QLabel(FtpUpload);
         statusLabel->setObjectName(QStringLiteral("statusLabel"));
-        statusLabel->setMinimumSize(QSize(450, 0));
+        statusLabel->setMinimumSize(QSize(500, 0));
         QFont font5;
         font5.setFamily(QString::fromUtf8("\345\276\256\350\275\257\351\233\205\351\273\221"));
         font5.setPointSize(12);
@@ -941,7 +941,7 @@ public:
     void retranslateUi(QWidget *FtpUpload)
     {
         FtpUpload->setWindowTitle(QApplication::translate("FtpUpload", "FtpUpload", Q_NULLPTR));
-        label->setText(QApplication::translate("FtpUpload", "FTP\345\256\242\346\210\267\347\253\257", Q_NULLPTR));
+        label->setText(QApplication::translate("FtpUpload", "               FTP\345\256\242\346\210\267\347\253\257", Q_NULLPTR));
         setButton->setText(QString());
         minButton->setText(QString());
         closeButton->setText(QString());
@@ -979,7 +979,7 @@ public:
         lineEdit_station->setToolTip(QApplication::translate("FtpUpload", "\345\220\215\347\247\260\344\270\215\350\203\275\345\214\205\345\220\253\344\273\273\344\275\225\345\255\227\347\254\246:\n"
 "\\\\/:*?\"<>|", Q_NULLPTR));
 #endif // QT_NO_TOOLTIP
-        label_currentpath->setText(QApplication::translate("FtpUpload", "  \345\275\223\345\211\215\350\267\257\345\276\204\357\274\232", Q_NULLPTR));
+        label_currentpath->setText(QApplication::translate("FtpUpload", "  \345\275\223\345\211\215\357\274\232", Q_NULLPTR));
         QTreeWidgetItem *___qtreewidgetitem = treeWidget->headerItem();
         ___qtreewidgetitem->setText(4, QApplication::translate("FtpUpload", "\347\273\204", Q_NULLPTR));
         ___qtreewidgetitem->setText(3, QApplication::translate("FtpUpload", "\346\235\203\351\231\220", Q_NULLPTR));

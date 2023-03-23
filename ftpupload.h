@@ -237,7 +237,7 @@ public:
   public:
     void initComponent(bool enable);
     void UploadCustomDir(const QString& path, const QString& pathname);
-    void UpFileList(const QString& path);
+    bool UpFileList(const QString& path);
     void sleep(unsigned int msec); // 延时功能
     bool backUp();                 // 上一级，返回： 根目录为 true
     void uploadStatusEvent(bool success, bool           ing,
