@@ -45,8 +45,19 @@ int main(int argc, char *argv[])
 
     setProcessAutoRunSelf(true);
 
+//    static QSharedMemory *shareMem = new QSharedMemory("FtpUpload2");
+//    if (!shareMem->create(1))
+//    {
+//        qApp->quit();
+//        return -1;
+//    }
+    QSharedMemory sm("FtpUpload2");
+        if(sm.attach())
+            return 0;
+        sm.create(1);
+
+
     FtpUpload w;
-//    w.setWindowIcon(QIcon(":/img/img/FTP.png"));
     w.show();
 
     return a.exec();
